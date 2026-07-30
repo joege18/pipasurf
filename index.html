@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PipaSurf — Previsão de Surf & Marés · Praia da Pipa</title>
+<title>PipaSurf — Surf & Tide Forecast · Praia da Pipa</title>
 <style>
   :root{
     color-scheme: dark;
@@ -235,8 +235,8 @@
     </a>
     <div class="spacer"></div>
     <div class="lang" role="group" aria-label="Idioma / Language">
-      <button id="btn-pt" class="on" onclick="setLang('pt')">PT</button>
-      <button id="btn-en" onclick="setLang('en')">EN</button>
+      <button id="btn-pt" onclick="setLang('pt')">PT</button>
+      <button id="btn-en" class="on" onclick="setLang('en')">EN</button>
     </div>
   </div>
 </header>
@@ -364,7 +364,7 @@ const I18N = {
     srcFootTide:`Data source: <a href="https://open-meteo.com/en/docs/marine-weather-api" target="_blank" rel="noopener">Open-Meteo Marine</a> (sea level) · Official reference: <a href="https://www.marinha.mil.br/chm/tabuas-de-mare" target="_blank" rel="noopener">Brazilian Navy — Tide Tables</a>`,
   }
 };
-let lang = "pt";
+let lang = "en";
 const t = (k)=>I18N[lang][k];
 
 /* ================= state ================= */

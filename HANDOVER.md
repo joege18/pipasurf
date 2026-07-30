@@ -11,7 +11,7 @@ The entire site is **one static file: `index.html`** — no build step, no frame
 ## Data flow (all in `index.html`'s `<script>`)
 
 - `liveData()` makes 3 fetches for Praia da Pipa (lat `-6.2278`, lon `-35.0442`, tz `America/Fortaleza`):
-  1. **Waves, multi-model** — Open-Meteo Marine API with `models=ncep_gfswave025,ecmwf_wam025,meteofrance_wave,gwam` (NOAA, ECMWF, Météo-France, DWD). Per-model daily max height / period / direction. The **consensus** shown is the per-day mean across models; day-card ranges are the min–max model spread. Model horizons differ, so trailing `null`s are filled forward per model (`fill()`).
+  1. **Waves, multi-model** — Open-Meteo Marine API with `models=ncep_gfswave025,ecmwf_wam025,gwam` (NOAA, ECMWF, DWD; Météo-France was removed at the owner's request). Per-model daily max height / period / direction. The **consensus** shown is the per-day mean across models; day-card ranges are the min–max model spread. Model horizons differ, so trailing `null`s are filled forward per model (`fill()`).
   2. **Tides** — Marine API `hourly=sea_level_height_msl`. **Station calibration**: `TIDE_DT = +26 min`, `TIDE_DATUM = +1.21 m` (the global tide model runs ~26 min early at Pipa and reports vs MSL, not local chart datum; these constants were fitted against the Abacateiro station / Surfline tide tables — do not remove them). Extremes (H/L) are found by local-extremum detection with parabolic refinement (`extremes()`).
   3. **Wind** — Open-Meteo forecast API, daily max speed (knots) and dominant direction.
 - `demoData()` is a seeded synthetic fallback used only if the fetches fail (offline/sandboxed contexts).

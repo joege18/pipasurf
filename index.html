@@ -458,8 +458,11 @@ async function liveData(){
   const sea=mj.hourly.time.map((iso,i)=>({t:new Date(iso), h:mj.hourly.sea_level_height_msl[i]}))
     .filter(p=>p.h!=null);
   if(sea.length<48) throw new Error("tide");
-  const base=Math.min(...sea.map(p=>p.h));
-  const tide=sea.map(p=>({t:p.t, h:p.h-base+0.15}));
+  /* station calibration for Pipa (vs Abacateiro tide station / Surfline):
+     the global tide model runs ~26 min early here, and reports height vs MSL
+     rather than the local chart datum (+1.21 m). */
+  const TIDE_DT=26*60000, TIDE_DATUM=1.21;
+  const tide=sea.map(p=>({t:new Date(p.t.getTime()+TIDE_DT), h:p.h+TIDE_DATUM}));
   return {days,tide};
 }
 

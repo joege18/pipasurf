@@ -391,7 +391,7 @@ const I18N = {
     compareLab:"Compare em:",
     shoreOff:"Mar aberto",
     shoreBeach:"Na praia",
-    shoreTip:"Altura na arrebentação estimada a partir do swell de mar aberto (fórmula de Komar–Gaughan).",
+    shoreTip:"Altura do surf na arrebentação, estimada a partir do componente de swell da previsão (fórmula de Komar–Gaughan; a marola de vento não conta).",
     showing:"Mostrando a previsão de 10 dias de:",
     agree:(p,d)=>`Concordância entre fontes (${d}): <b>${p}%</b> — quanto maior, mais confiável a previsão.`,
     tblToggle:"Ver tabela de marés",
@@ -429,7 +429,7 @@ const I18N = {
     compareLab:"Compare on:",
     shoreOff:"Offshore",
     shoreBeach:"Beach",
-    shoreTip:"Breaking-wave height estimated from offshore swell (Komar–Gaughan formula).",
+    shoreTip:"Breaking surf height, estimated from the swell component of the forecast (Komar–Gaughan formula; wind chop doesn't count).",
     showing:"Showing the 10-day forecast from:",
     agree:(p,d)=>`Source agreement (${d}): <b>${p}%</b> — the higher, the more reliable the forecast.`,
     tblToggle:"View tide table",
@@ -470,11 +470,19 @@ const COMPARE=[
   {name:"Windy.app",     url:"https://windy.app/forecast2/spot/624146/Praia+da+Pipa"}
 ];
 let DATA=null, isLive=false, lastUpdate=null, srcSel=null, daySel=0, shoreMode="beach"; /* srcSel null = consensus */
-/* Komar & Gaughan (1972) breaker-height estimate from offshore Hs + period.
-   Ratings follow the displayed heights in either mode. */
-function dispH(h,T){
+/* Breaking surf height: Komar & Gaughan (1972) applied to the SWELL partition
+   (short-period windsea adds chop, not rideable size — this is what makes the
+   estimate track reported surf heights). Model spread is preserved by scaling
+   with each model's offshore ratio. Ratings follow the displayed heights. */
+const KG=(H,T)=>0.39*Math.pow(9.81,0.2)*Math.pow((T||8)*H*H,0.4);
+function dispH(h,T,d){
   if(shoreMode!=="beach"||h==null) return h;
-  return +(0.39*Math.pow(9.81,0.2)*Math.pow((T||8)*h*h,0.4)).toFixed(1);
+  if(d&&d.swellH!=null){
+    const ref=d.refCons??d.hCons??d.hMax??h;
+    const base=KG(d.swellH,d.swellT||T);
+    return +(base*(ref?h/ref:1)).toFixed(1);
+  }
+  return +KG(h,T).toFixed(1);
 }
 function setShore(m){shoreMode=m;renderChrome();renderWave();renderDays();renderSources();}
 function viewDays(){
@@ -483,7 +491,7 @@ function viewDays(){
   return DATA.days.map((d,i)=>{
     const m=DATA.byModel[srcSel][i]||{};
     const h=m.hMax??d.hCons??d.hMax;
-    return {...d, hMin:h, hMax:h, hCons:h,
+    return {...d, hMin:h, hMax:h, hCons:h, refCons:d.hCons??d.hMax,
       period:m.period??d.period, swellDir:m.swellDir??d.swellDir};
   });
 }
@@ -519,7 +527,7 @@ function demoData(){
     const h=1.32+1.05*Math.cos(2*Math.PI*(hrs-2.4)/12.42)+0.22*Math.cos(2*Math.PI*hrs/12+1.1);
     tide.push({t:tt,h});
   }
-  days.forEach(d=>{d.hCons=+((d.hMin+d.hMax)/2).toFixed(1)});
+  days.forEach(d=>{d.hCons=+((d.hMin+d.hMax)/2).toFixed(1); d.swellH=+(d.hCons*0.75).toFixed(2); d.swellT=d.period;});
   const DEMO_BIAS=[1.05,1.1,0.95];
   const byModel=DEMO_BIAS.map(b=>days.map(d=>({
     hMax:+(d.hCons*b).toFixed(1), period:d.period, swellDir:d.swellDir})));
@@ -529,7 +537,7 @@ function demoData(){
 /* ================= live data (Open-Meteo) ================= */
 async function liveData(){
   const base=`latitude=${LAT}&longitude=${LON}&timezone=${encodeURIComponent(TZ)}&forecast_days=10`;
-  const tideURL=`https://marine-api.open-meteo.com/v1/marine?${base}&hourly=sea_level_height_msl`;
+  const tideURL=`https://marine-api.open-meteo.com/v1/marine?${base}&hourly=sea_level_height_msl&daily=swell_wave_height_max,swell_wave_period_max`;
   const modelURL=`https://marine-api.open-meteo.com/v1/marine?${base}`+
     `&daily=wave_height_max,wave_period_max,wave_direction_dominant&models=${MODELS.map(m=>m.id).join(",")}`;
   const windURL=`https://api.open-meteo.com/v1/forecast?${base}`+
@@ -550,6 +558,7 @@ async function liveData(){
     }));
   });
   const WS=fill(wj.daily.wind_speed_10m_max), WD=fill(wj.daily.wind_direction_10m_dominant);
+  const SW=fill(tj.daily&&tj.daily.swell_wave_height_max), ST=fill(tj.daily&&tj.daily.swell_wave_period_max);
   const days=mj.daily.time.map((iso,i)=>{
     const vals=byModel.map(mm=>mm[i]).filter(v=>v&&v.hMax!=null);
     const hs=vals.map(v=>v.hMax);
@@ -567,6 +576,8 @@ async function liveData(){
       swellDir:Math.round(dir),
       windKts:Math.round(WS[i]??12),
       windDir:Math.round(WD[i]??130),
+      swellH:SW[i]??null,
+      swellT:ST[i]??null,
     };
   });
   const sea=tj.hourly.time.map((iso,i)=>({t:new Date(iso), h:tj.hourly.sea_level_height_msl[i]}))
@@ -605,7 +616,7 @@ const compass=(deg)=>{const c=lang==="pt"?["N","NE","L","SE","S","SO","O","NO"]:
 function rating(d){
   /* rated purely on the day's max height AS DISPLAYED (beach or offshore):
      below 1.5 m Poor · 1.5–1.8 m Good · 1.9–2.5 m Great · above 2.5 m Epic */
-  const h=dispH(d.hMax,d.period);
+  const h=dispH(d.hMax,d.period,d);
   if(h<1.5) return 0;
   if(h<1.9) return 1;
   if(h<=2.5) return 2;
@@ -640,7 +651,7 @@ function renderWave(){
   const days=viewDays();
   const W=1040,H=230,padL=44,padR=10,padT=26,padB=34;
   const iw=W-padL-padR, ih=H-padT-padB;
-  const val=(d)=>dispH(d.hCons??d.hMax,d.period);
+  const val=(d)=>dispH(d.hCons??d.hMax,d.period,d);
   const maxH=Math.max(2,Math.ceil(Math.max(...days.map(val))*2)/2+0.5);
   const y=(v)=>padT+ih*(1-v/maxH);
   const band=iw/10;
@@ -681,7 +692,7 @@ function renderWave(){
       title.textContent=`${t("daysFull")[d.date.getDay()]} ${d.date.getDate()} ${t("months")[d.date.getMonth()]}`;
       tt.appendChild(title);
       const rows=[
-        [t("wave"),`${dispH(d.hMin,d.period).toFixed(1)}–${dispH(d.hMax,d.period).toFixed(1)} m`,"var(--wave)"],
+        [t("wave"),`${dispH(d.hMin,d.period,d).toFixed(1)}–${dispH(d.hMax,d.period,d).toFixed(1)} m`,"var(--wave)"],
         [t("period"),`${d.period} s`,"var(--wave)"],
         [t("swell"),`${compass(d.swellDir)}`,"var(--wave)"],
         [t("wind"),`${d.windKts} kt ${compass(d.windDir)}`,"var(--tide)"],
@@ -717,7 +728,7 @@ function renderDays(){
     card.innerHTML=
       `<div class="dw">${i===0?t("today"):t("days")[d.date.getDay()]}</div>`+
       `<div class="dt">${d.date.getDate()} ${t("months")[d.date.getMonth()]}</div>`+
-      `<div class="hh">${(()=>{const lo=dispH(d.hMin,d.period),hi=dispH(d.hMax,d.period);return lo===hi?hi.toFixed(1):lo.toFixed(1)+"–"+hi.toFixed(1)})()}<small> m</small></div>`+
+      `<div class="hh">${(()=>{const lo=dispH(d.hMin,d.period,d),hi=dispH(d.hMax,d.period,d);return lo===hi?hi.toFixed(1):lo.toFixed(1)+"–"+hi.toFixed(1)})()}<small> m</small></div>`+
       `<span class="rate r${r}">${t("ratings")[r]}</span>`+
       `<div class="meta"><b>${d.period}s</b> ${dirArrow(d.swellDir)}<br>${d.windKts}kt ${dirArrow(d.windDir)} ${compass(d.windDir)}</div>`;
     card.addEventListener("click",()=>{daySel=i;renderWave();renderDays();renderSources();});
@@ -730,10 +741,10 @@ function renderSources(){
   const el=document.getElementById("src-chips");
   el.innerHTML="";
   const selDay=DATA.days[daySel]||DATA.days[0];
-  const today=dispH(selDay.hCons??selDay.hMax,selDay.period);
+  const today=dispH(selDay.hCons??selDay.hMax,selDay.period,selDay);
   const vals=MODELS.map((m,mi)=>{
     const md=DATA.byModel[mi]&&DATA.byModel[mi][daySel];
-    return md&&md.hMax!=null?dispH(md.hMax,md.period??selDay.period):null;
+    return md&&md.hMax!=null?dispH(md.hMax,md.period??selDay.period,selDay):null;
   });
   const dayLabel=daySel===0?t("todayLower"):`${t("days")[selDay.date.getDay()]} ${selDay.date.getDate()} ${t("months")[selDay.date.getMonth()]}`;
   document.getElementById("src-lab").textContent=t("srcLab")(dayLabel);

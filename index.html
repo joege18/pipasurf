@@ -132,6 +132,17 @@
     padding:22px 22px 18px;
   }
   .sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:4px}
+  .seg{
+    display:flex;align-items:center;background:var(--surface-2);
+    border:1px solid var(--border);border-radius:999px;padding:3px;margin-left:auto;
+  }
+  .seg button{
+    border:0;background:transparent;color:var(--muted);font-family:inherit;
+    font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:999px;cursor:pointer;
+    transition:color .15s;
+  }
+  .seg button:hover{color:var(--ink)}
+  .seg button.on{background:linear-gradient(90deg,var(--wave),var(--tide));color:#08110c}
   .sec-head h2{font-size:19px;font-weight:750;letter-spacing:-.015em;display:flex;align-items:center;gap:9px}
   .sec-head h2 .key{width:14px;height:14px;border-radius:4px;flex:none}
   .sec-head .sub{font-size:12.5px;color:var(--muted)}
@@ -309,6 +320,10 @@
       <div class="sec-head">
         <h2><span class="key" style="background:var(--wave)"></span><span data-i18n="surfTitle"></span></h2>
         <span class="sub" data-i18n="surfSub"></span>
+        <div class="seg" id="shore-seg">
+          <button type="button" id="btn-shore-off" class="on" onclick="setShore('off')"></button>
+          <button type="button" id="btn-shore-beach" onclick="setShore('beach')"></button>
+        </div>
       </div>
       <div class="chart-wrap" id="wave-wrap">
         <svg id="wave-svg" viewBox="0 0 1040 230" role="img" aria-label="wave height chart"></svg>
@@ -374,6 +389,9 @@ const I18N = {
     todayLower:"hoje",
     consensus:"Consenso",
     compareLab:"Compare em:",
+    shoreOff:"Mar aberto",
+    shoreBeach:"Na praia (est.)",
+    shoreTip:"Estimativa da altura na arrebentação a partir do swell de mar aberto (fórmula de Komar–Gaughan). As classificações continuam baseadas no mar aberto.",
     showing:"Mostrando a previsão de 10 dias de:",
     agree:(p,d)=>`Concordância entre fontes (${d}): <b>${p}%</b> — quanto maior, mais confiável a previsão.`,
     tblToggle:"Ver tabela de marés",
@@ -409,6 +427,9 @@ const I18N = {
     todayLower:"today",
     consensus:"Consensus",
     compareLab:"Compare on:",
+    shoreOff:"Offshore",
+    shoreBeach:"Beach (est.)",
+    shoreTip:"Breaking-wave height estimated from offshore swell (Komar–Gaughan formula). Ratings stay based on offshore height.",
     showing:"Showing the 10-day forecast from:",
     agree:(p,d)=>`Source agreement (${d}): <b>${p}%</b> — the higher, the more reliable the forecast.`,
     tblToggle:"View tide table",
@@ -448,7 +469,14 @@ const COMPARE=[
   {name:"Windfinder",    url:"https://www.windfinder.com/forecast/pipa_praia_da_pipa"},
   {name:"Windy.app",     url:"https://windy.app/forecast2/spot/624146/Praia+da+Pipa"}
 ];
-let DATA=null, isLive=false, lastUpdate=null, srcSel=null, daySel=0; /* srcSel null = consensus */
+let DATA=null, isLive=false, lastUpdate=null, srcSel=null, daySel=0, shoreMode="off"; /* srcSel null = consensus */
+/* Komar & Gaughan (1972) breaker-height estimate from offshore Hs + period.
+   Display-only: ratings stay anchored to offshore heights. */
+function dispH(h,T){
+  if(shoreMode!=="beach"||h==null) return h;
+  return +(0.39*Math.pow(9.81,0.2)*Math.pow((T||8)*h*h,0.4)).toFixed(1);
+}
+function setShore(m){shoreMode=m;renderChrome();renderWave();renderDays();renderSources();}
 function viewDays(){
   if(!DATA) return [];
   if(srcSel==null) return DATA.days;
@@ -600,6 +628,10 @@ function renderChrome(){
   document.getElementById("src-foot-surf").innerHTML=t("srcFootSurf");
   document.getElementById("src-foot-tide").innerHTML=t("srcFootTide");
   document.getElementById("ad-banner").innerHTML=t("banner");
+  const so=document.getElementById("btn-shore-off"), sb=document.getElementById("btn-shore-beach");
+  so.textContent=t("shoreOff"); sb.textContent=t("shoreBeach");
+  so.classList.toggle("on",shoreMode==="off"); sb.classList.toggle("on",shoreMode==="beach");
+  document.getElementById("shore-seg").title=t("shoreTip");
 }
 
 /* ================= render: wave chart ================= */
@@ -608,7 +640,7 @@ function renderWave(){
   const days=viewDays();
   const W=1040,H=230,padL=44,padR=10,padT=26,padB=34;
   const iw=W-padL-padR, ih=H-padT-padB;
-  const val=(d)=>d.hCons??d.hMax;
+  const val=(d)=>dispH(d.hCons??d.hMax,d.period);
   const maxH=Math.max(2,Math.ceil(Math.max(...days.map(val))*2)/2+0.5);
   const y=(v)=>padT+ih*(1-v/maxH);
   const band=iw/10;
@@ -649,7 +681,7 @@ function renderWave(){
       title.textContent=`${t("daysFull")[d.date.getDay()]} ${d.date.getDate()} ${t("months")[d.date.getMonth()]}`;
       tt.appendChild(title);
       const rows=[
-        [t("wave"),`${d.hMin.toFixed(1)}–${d.hMax.toFixed(1)} m`,"var(--wave)"],
+        [t("wave"),`${dispH(d.hMin,d.period).toFixed(1)}–${dispH(d.hMax,d.period).toFixed(1)} m`,"var(--wave)"],
         [t("period"),`${d.period} s`,"var(--wave)"],
         [t("swell"),`${compass(d.swellDir)}`,"var(--wave)"],
         [t("wind"),`${d.windKts} kt ${compass(d.windDir)}`,"var(--tide)"],
@@ -685,7 +717,7 @@ function renderDays(){
     card.innerHTML=
       `<div class="dw">${i===0?t("today"):t("days")[d.date.getDay()]}</div>`+
       `<div class="dt">${d.date.getDate()} ${t("months")[d.date.getMonth()]}</div>`+
-      `<div class="hh">${d.hMin===d.hMax?d.hMax.toFixed(1):d.hMin.toFixed(1)+"–"+d.hMax.toFixed(1)}<small> m</small></div>`+
+      `<div class="hh">${(()=>{const lo=dispH(d.hMin,d.period),hi=dispH(d.hMax,d.period);return lo===hi?hi.toFixed(1):lo.toFixed(1)+"–"+hi.toFixed(1)})()}<small> m</small></div>`+
       `<span class="rate r${r}">${t("ratings")[r]}</span>`+
       `<div class="meta"><b>${d.period}s</b> ${dirArrow(d.swellDir)}<br>${d.windKts}kt ${dirArrow(d.windDir)} ${compass(d.windDir)}</div>`;
     card.addEventListener("click",()=>{daySel=i;renderWave();renderDays();renderSources();});
@@ -698,8 +730,11 @@ function renderSources(){
   const el=document.getElementById("src-chips");
   el.innerHTML="";
   const selDay=DATA.days[daySel]||DATA.days[0];
-  const today=selDay.hCons??selDay.hMax;
-  const vals=MODELS.map((m,mi)=>DATA.byModel[mi]&&DATA.byModel[mi][daySel]?DATA.byModel[mi][daySel].hMax:null);
+  const today=dispH(selDay.hCons??selDay.hMax,selDay.period);
+  const vals=MODELS.map((m,mi)=>{
+    const md=DATA.byModel[mi]&&DATA.byModel[mi][daySel];
+    return md&&md.hMax!=null?dispH(md.hMax,md.period??selDay.period):null;
+  });
   const dayLabel=daySel===0?t("todayLower"):`${t("days")[selDay.date.getDay()]} ${selDay.date.getDate()} ${t("months")[selDay.date.getMonth()]}`;
   document.getElementById("src-lab").textContent=t("srcLab")(dayLabel);
   const mk=(label,val,idx,cls)=>{

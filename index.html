@@ -476,14 +476,18 @@ let DATA=null, isLive=false, lastUpdate=null, srcSel=null, daySel=0, shoreMode="
    estimate track reported surf heights). Model spread is preserved by scaling
    with each model's offshore ratio. Ratings follow the displayed heights. */
 const KG=(H,T)=>0.39*Math.pow(9.81,0.2)*Math.pow((T||8)*H*H,0.4);
-function dispH(h,T,d){
-  if(shoreMode!=="beach"||h==null) return h;
+function beachH(h,T,d){
+  if(h==null) return h;
   if(d&&d.swellH!=null){
     const ref=d.refCons??d.hCons??d.hMax??h;
     const base=KG(d.swellH,d.swellT||T);
     return +(base*(ref?h/ref:1)).toFixed(1);
   }
   return +KG(h,T).toFixed(1);
+}
+function dispH(h,T,d){
+  if(shoreMode!=="beach"||h==null) return h;
+  return beachH(h,T,d);
 }
 function setShore(m){shoreMode=m;renderChrome();renderWave();renderDays();renderSources();}
 function viewDays(){
@@ -615,9 +619,10 @@ const fmtTime=(d)=>d.toLocaleTimeString(lang==="pt"?"pt-BR":"en-US",{hour:"2-dig
 const dirArrow=(deg)=>`<span class="arrow" style="transform:rotate(${deg+180}deg)">↑</span>`;
 const compass=(deg)=>{const c=lang==="pt"?["N","NE","L","SE","S","SO","O","NO"]:["N","NE","E","SE","S","SW","W","NW"];return c[Math.round(deg/45)%8]};
 function rating(d){
-  /* rated on the day's max surf height AS DISPLAYED (beach or offshore):
+  /* rated on the day's max BEACH surf height — fixed, does NOT change with the
+     Beach/Offshore display toggle:
      < 0.5 m Poor · 0.5–0.9 Fair · 1.0–1.4 Good · 1.5–2.0 Great · > 2.0 Epic */
-  const h=dispH(d.hMax,d.period,d);
+  const h=beachH(d.hMax,d.period,d);
   if(h<0.5) return 0;
   if(h<1.0) return 1;
   if(h<1.5) return 2;

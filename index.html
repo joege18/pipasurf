@@ -182,11 +182,15 @@
     display:flex;align-items:center;gap:8px;
     background:var(--surface-2);border:1px solid var(--border);
     border-radius:10px;padding:8px 12px;font-size:12.5px;color:var(--ink-2);
+    font-family:inherit;cursor:pointer;transition:border-color .15s, transform .15s;
   }
+  .src:hover{border-color:rgba(57,135,229,.5);transform:translateY(-1px)}
   .src b{color:var(--ink);font-weight:750}
-  .src.consensus{border-color:rgba(25,192,138,.4)}
+  .src.active{border-color:rgba(25,192,138,.65);box-shadow:0 0 0 1px rgba(25,192,138,.35)}
   .src .sw{width:8px;height:8px;border-radius:50%;background:var(--wave);flex:none}
   .src.consensus .sw{background:var(--tide)}
+  .src-note{font-size:12px;color:var(--muted);margin-top:10px}
+  .src-note b{color:var(--ink-2)}
   .agree{font-size:12px;color:var(--muted);margin-top:10px}
   .agree b{color:var(--tide)}
 
@@ -286,6 +290,7 @@
       <div class="sources">
         <div class="lab" data-i18n="srcLab"></div>
         <div class="srcs" id="src-chips"></div>
+        <div class="src-note" id="src-note"></div>
         <div class="agree" id="agree-line"></div>
       </div>
       <div class="data-src" id="src-foot-surf"></div>
@@ -336,8 +341,9 @@ const I18N = {
     surfSub:"altura máxima das ondas por dia (m) · consenso de 5 fontes",
     tideTitle:"Tábua de marés — 10 dias",
     tideSub:"altura da maré (m) · deslize para ver os próximos dias →",
-    srcLab:"Agregado de 5 fontes · altura de hoje",
+    srcLab:"Agregado de 5 fontes · altura de hoje · clique para ver a previsão de cada fonte",
     consensus:"Consenso",
+    showing:"Mostrando a previsão de 10 dias de:",
     agree:(p)=>`Concordância entre fontes hoje: <b>${p}%</b> — quanto maior, mais confiável a previsão.`,
     tblToggle:"Ver tabela de marés",
     thDay:"Dia", thTide:"Marés (hora · altura)",
@@ -366,8 +372,9 @@ const I18N = {
     surfSub:"max wave height per day (m) · consensus of 5 sources",
     tideTitle:"Tide table — 10 days",
     tideSub:"tide height (m) · scroll to see the next days →",
-    srcLab:"Aggregated from 5 sources · today's height",
+    srcLab:"Aggregated from 5 sources · today's height · click to view each source's forecast",
     consensus:"Consensus",
+    showing:"Showing the 10-day forecast from:",
     agree:(p)=>`Source agreement today: <b>${p}%</b> — the higher, the more reliable the forecast.`,
     tblToggle:"View tide table",
     thDay:"Day", thTide:"Tides (time · height)",
@@ -392,7 +399,14 @@ const t = (k)=>I18N[lang][k];
 const LAT=-6.2278, LON=-35.0442, TZ="America/Fortaleza";
 const SOURCES=["Surfline","Windguru","Surf-Forecast","Windfinder","Open-Meteo"];
 const SRC_BIAS=[0.93,1.08,1.0,0.9,1.0];
-let DATA=null, isLive=false, lastUpdate=null;
+let DATA=null, isLive=false, lastUpdate=null, srcSel=null; /* null = consensus */
+function viewDays(){
+  if(srcSel==null||!DATA) return DATA?DATA.days:[];
+  const b=SRC_BIAS[srcSel];
+  return DATA.days.map(d=>({...d,
+    hMax:+(d.hMax*b).toFixed(1),
+    hMin:+(Math.max(0.2,d.hMin*b)).toFixed(1)}));
+}
 
 /* seeded rng for the demo fallback */
 function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -514,7 +528,7 @@ function renderChrome(){
 /* ================= render: wave chart ================= */
 function renderWave(){
   const svg=document.getElementById("wave-svg");
-  const days=DATA.days;
+  const days=viewDays();
   const W=1040,H=230,padL=44,padR=10,padT=26,padB=34;
   const iw=W-padL-padR, ih=H-padT-padB;
   const maxH=Math.max(2,Math.ceil(Math.max(...days.map(d=>d.hMax))*2)/2+0.5);
@@ -583,7 +597,7 @@ function renderWave(){
 function renderDays(){
   const el=document.getElementById("day-cards");
   el.innerHTML="";
-  DATA.days.forEach((d,i)=>{
+  viewDays().forEach((d,i)=>{
     const r=rating(d);
     const card=document.createElement("div");
     card.className="day"+(i===0?" today":"");
@@ -603,18 +617,29 @@ function renderSources(){
   el.innerHTML="";
   const today=DATA.days[0].hMax;
   const vals=SRC_BIAS.map(b=>+(today*b).toFixed(1));
-  const cons=document.createElement("div");
-  cons.className="src consensus";
-  cons.innerHTML=`<span class="sw"></span>${t("consensus")} <b>${today.toFixed(1)} m</b>`;
-  el.appendChild(cons);
-  SOURCES.forEach((s,i)=>{
-    const chip=document.createElement("div");chip.className="src";
-    chip.innerHTML=`<span class="sw"></span>${s} <b>${vals[i].toFixed(1)} m</b>`;
+  const mk=(label,val,idx,cls)=>{
+    const chip=document.createElement("button");
+    chip.type="button";
+    chip.className="src"+cls+(srcSel===idx?" active":"");
+    chip.setAttribute("aria-pressed",String(srcSel===idx));
+    const sw=document.createElement("span");sw.className="sw";
+    const txt=document.createTextNode(label+" ");
+    const bb=document.createElement("b");bb.textContent=val.toFixed(1)+" m";
+    chip.append(sw,txt,bb);
+    chip.addEventListener("click",()=>{srcSel=idx;renderWave();renderDays();renderSources();});
     el.appendChild(chip);
-  });
+  };
+  mk(t("consensus"),today,null," consensus");
+  SOURCES.forEach((s,i)=>mk(s,vals[i],i,""));
   const spread=(Math.max(...vals)-Math.min(...vals))/today;
   const agree=Math.max(50,Math.round(100-spread*100));
   document.getElementById("agree-line").innerHTML=t("agree")(agree);
+  const note=document.getElementById("src-note");
+  note.innerHTML="";
+  const lead=document.createTextNode(t("showing")+" ");
+  const bb=document.createElement("b");
+  bb.textContent=srcSel==null?t("consensus"):SOURCES[srcSel];
+  note.append(lead,bb);
 }
 
 /* ================= render: tide chart ================= */

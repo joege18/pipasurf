@@ -197,10 +197,11 @@
     font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
     border-radius:999px;padding:3px 8px;margin:0 auto;
   }
-  .r0{background:rgba(230,103,103,.16);color:#ee8484}   /* Poor  — red    (< 1.5 m)   */
-  .r1{background:rgba(57,135,229,.18);color:#6da7ec}    /* Good  — blue   (1.5–1.8 m) */
-  .r2{background:rgba(25,192,138,.18);color:#3fd6a4}    /* Great — green  (1.9–2.5 m) */
-  .r3{background:rgba(167,111,235,.2);color:#c39bf2}    /* Epic  — purple (> 2.5 m)   */
+  .r0{background:rgba(230,103,103,.16);color:#ee8484}   /* Poor  — red    (< 0.5 m)   */
+  .r1{background:rgba(230,180,90,.16);color:#e6c076}    /* Fair  — amber  (0.5–0.9 m) */
+  .r2{background:rgba(57,135,229,.18);color:#6da7ec}    /* Good  — blue   (1.0–1.4 m) */
+  .r3{background:rgba(25,192,138,.18);color:#3fd6a4}    /* Great — green  (1.5–2.0 m) */
+  .r4{background:rgba(167,111,235,.2);color:#c39bf2}    /* Epic  — purple (> 2.0 m)   */
 
   /* ---------- sources ---------- */
   .sources{margin-top:18px;border-top:1px solid var(--grid);padding-top:14px}
@@ -401,7 +402,7 @@ const I18N = {
     daysFull:["domingo","segunda","terça","quarta","quinta","sexta","sábado"],
     months:["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"],
     today:"hoje",
-    ratings:["Fraco","Bom","Ótimo","Épico"],
+    ratings:["Fraco","Razoável","Bom","Ótimo","Épico"],
     wave:"Ondas", period:"Período", wind:"Vento", swell:"Ondulação",
     footLeft:(t)=>`Atualização automática a cada hora · última: ${t}`,
     footRight:"PipaSurf.com — feito para o mar da Pipa 🤙",
@@ -439,7 +440,7 @@ const I18N = {
     daysFull:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
     months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     today:"today",
-    ratings:["Poor","Good","Great","Epic"],
+    ratings:["Poor","Fair","Good","Great","Epic"],
     wave:"Waves", period:"Period", wind:"Wind", swell:"Swell",
     footLeft:(t)=>`Auto-updates every hour · last: ${t}`,
     footRight:"PipaSurf.com — made for Pipa's ocean 🤙",
@@ -614,13 +615,14 @@ const fmtTime=(d)=>d.toLocaleTimeString(lang==="pt"?"pt-BR":"en-US",{hour:"2-dig
 const dirArrow=(deg)=>`<span class="arrow" style="transform:rotate(${deg+180}deg)">↑</span>`;
 const compass=(deg)=>{const c=lang==="pt"?["N","NE","L","SE","S","SO","O","NO"]:["N","NE","E","SE","S","SW","W","NW"];return c[Math.round(deg/45)%8]};
 function rating(d){
-  /* rated purely on the day's max height AS DISPLAYED (beach or offshore):
-     below 1.5 m Poor · 1.5–1.8 m Good · 1.9–2.5 m Great · above 2.5 m Epic */
+  /* rated on the day's max surf height AS DISPLAYED (beach or offshore):
+     < 0.5 m Poor · 0.5–0.9 Fair · 1.0–1.4 Good · 1.5–2.0 Great · > 2.0 Epic */
   const h=dispH(d.hMax,d.period,d);
-  if(h<1.5) return 0;
-  if(h<1.9) return 1;
-  if(h<=2.5) return 2;
-  return 3;
+  if(h<0.5) return 0;
+  if(h<1.0) return 1;
+  if(h<1.5) return 2;
+  if(h<=2.0) return 3;
+  return 4;
 }
 
 /* ================= render: hero/chrome ================= */

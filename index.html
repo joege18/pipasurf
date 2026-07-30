@@ -321,8 +321,8 @@
         <h2><span class="key" style="background:var(--wave)"></span><span data-i18n="surfTitle"></span></h2>
         <span class="sub" data-i18n="surfSub"></span>
         <div class="seg" id="shore-seg">
-          <button type="button" id="btn-shore-off" class="on" onclick="setShore('off')"></button>
-          <button type="button" id="btn-shore-beach" onclick="setShore('beach')"></button>
+          <button type="button" id="btn-shore-beach" class="on" onclick="setShore('beach')"></button>
+          <button type="button" id="btn-shore-off" onclick="setShore('off')"></button>
         </div>
       </div>
       <div class="chart-wrap" id="wave-wrap">
@@ -390,8 +390,8 @@ const I18N = {
     consensus:"Consenso",
     compareLab:"Compare em:",
     shoreOff:"Mar aberto",
-    shoreBeach:"Na praia (est.)",
-    shoreTip:"Estimativa da altura na arrebentação a partir do swell de mar aberto (fórmula de Komar–Gaughan). As classificações continuam baseadas no mar aberto.",
+    shoreBeach:"Na praia",
+    shoreTip:"Altura na arrebentação estimada a partir do swell de mar aberto (fórmula de Komar–Gaughan).",
     showing:"Mostrando a previsão de 10 dias de:",
     agree:(p,d)=>`Concordância entre fontes (${d}): <b>${p}%</b> — quanto maior, mais confiável a previsão.`,
     tblToggle:"Ver tabela de marés",
@@ -428,8 +428,8 @@ const I18N = {
     consensus:"Consensus",
     compareLab:"Compare on:",
     shoreOff:"Offshore",
-    shoreBeach:"Beach (est.)",
-    shoreTip:"Breaking-wave height estimated from offshore swell (Komar–Gaughan formula). Ratings stay based on offshore height.",
+    shoreBeach:"Beach",
+    shoreTip:"Breaking-wave height estimated from offshore swell (Komar–Gaughan formula).",
     showing:"Showing the 10-day forecast from:",
     agree:(p,d)=>`Source agreement (${d}): <b>${p}%</b> — the higher, the more reliable the forecast.`,
     tblToggle:"View tide table",
@@ -469,9 +469,9 @@ const COMPARE=[
   {name:"Windfinder",    url:"https://www.windfinder.com/forecast/pipa_praia_da_pipa"},
   {name:"Windy.app",     url:"https://windy.app/forecast2/spot/624146/Praia+da+Pipa"}
 ];
-let DATA=null, isLive=false, lastUpdate=null, srcSel=null, daySel=0, shoreMode="off"; /* srcSel null = consensus */
+let DATA=null, isLive=false, lastUpdate=null, srcSel=null, daySel=0, shoreMode="beach"; /* srcSel null = consensus */
 /* Komar & Gaughan (1972) breaker-height estimate from offshore Hs + period.
-   Display-only: ratings stay anchored to offshore heights. */
+   Ratings follow the displayed heights in either mode. */
 function dispH(h,T){
   if(shoreMode!=="beach"||h==null) return h;
   return +(0.39*Math.pow(9.81,0.2)*Math.pow((T||8)*h*h,0.4)).toFixed(1);
@@ -603,9 +603,9 @@ const fmtTime=(d)=>d.toLocaleTimeString(lang==="pt"?"pt-BR":"en-US",{hour:"2-dig
 const dirArrow=(deg)=>`<span class="arrow" style="transform:rotate(${deg+180}deg)">↑</span>`;
 const compass=(deg)=>{const c=lang==="pt"?["N","NE","L","SE","S","SO","O","NO"]:["N","NE","E","SE","S","SW","W","NW"];return c[Math.round(deg/45)%8]};
 function rating(d){
-  /* rated purely on the day's max height:
+  /* rated purely on the day's max height AS DISPLAYED (beach or offshore):
      below 1.5 m Poor · 1.5–1.8 m Good · 1.9–2.5 m Great · above 2.5 m Epic */
-  const h=d.hMax;
+  const h=dispH(d.hMax,d.period);
   if(h<1.5) return 0;
   if(h<1.9) return 1;
   if(h<=2.5) return 2;

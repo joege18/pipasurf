@@ -349,16 +349,16 @@ const I18N = {
   pt:{
     loc:"Praia da Pipa · Rio Grande do Norte · Brasil",
     heroH1:'Surf e marés da Pipa, <em>sempre atualizados</em>.',
-    heroSub:"Previsão de 10 dias agregada das 6 principais fontes de surf do mundo, mais a tábua de marés completa.",
+    heroSub:"Previsão de 10 dias com o consenso de 4 modelos globais de ondas (NOAA, ECMWF, Météo-France e DWD), mais a tábua de marés completa.",
     pillSpot:"Praia da Pipa · RN",
     updated:"Atualizado às",
     live:"dados ao vivo",
     demo:"demonstração (dados simulados)",
     surfTitle:"Previsão de surf — 10 dias",
-    surfSub:"altura máxima das ondas por dia (m) · consenso de 6 fontes",
+    surfSub:"altura máxima das ondas por dia (m) · consenso de 4 modelos globais",
     tideTitle:"Tábua de marés — 10 dias",
     tideSub:"altura da maré (m) · deslize para ver os próximos dias →",
-    srcLab:(d)=>`Agregado de 6 fontes · altura de ${d} · clique num dia acima e numa fonte abaixo`,
+    srcLab:(d)=>`Consenso de 4 modelos globais · altura de ${d} · clique num dia acima e num modelo abaixo`,
     todayLower:"hoje",
     consensus:"Consenso",
     showing:"Mostrando a previsão de 10 dias de:",
@@ -374,7 +374,7 @@ const I18N = {
     wave:"Ondas", period:"Período", wind:"Vento", swell:"Ondulação",
     footLeft:(t)=>`Atualização automática a cada hora · última: ${t}`,
     footRight:"PipaSurf.com — feito para o mar da Pipa 🤙",
-    srcFootSurf:`Fontes de dados: <a href="https://www.surfline.com/surf-report/praia-da-pipa/5842041f4e65fad6a7708fa4" target="_blank" rel="noopener">Surfline</a> · <a href="https://www.windguru.cz/209214" target="_blank" rel="noopener">Windguru</a> · <a href="https://www.surf-forecast.com/breaks/Praia-de-Pipa" target="_blank" rel="noopener">Surf-Forecast</a> · <a href="https://www.windfinder.com/forecast/pipa_praia_da_pipa" target="_blank" rel="noopener">Windfinder</a> · <a href="https://windy.app/forecast2/spot/624146/Praia+da+Pipa" target="_blank" rel="noopener">Windy.app</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (modelos NOAA GFS-Wave e ECMWF)`,
+    srcFootSurf:`Dados: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> — modelos NOAA GFS-Wave, ECMWF WAM, Météo-France MFWAM e DWD GWAM · Compare: <a href="https://www.surfline.com/surf-report/praia-da-pipa/5842041f4e65fad6a7708fa4" target="_blank" rel="noopener">Surfline</a> · <a href="https://www.windguru.cz/209214" target="_blank" rel="noopener">Windguru</a> · <a href="https://www.surf-forecast.com/breaks/Praia-de-Pipa" target="_blank" rel="noopener">Surf-Forecast</a> · <a href="https://www.windfinder.com/forecast/pipa_praia_da_pipa" target="_blank" rel="noopener">Windfinder</a> · <a href="https://windy.app/forecast2/spot/624146/Praia+da+Pipa" target="_blank" rel="noopener">Windy.app</a>`,
     srcFootTide:`Fonte de dados: <a href="https://open-meteo.com/en/docs/marine-weather-api" target="_blank" rel="noopener">Open-Meteo Marine</a> (nível do mar) · Referência oficial: <a href="https://www.marinha.mil.br/chm/tabuas-de-mare" target="_blank" rel="noopener">Marinha do Brasil — Tábuas de Maré</a>`,
     banner:`Feito com <span class="heart">❤️</span> pelo pessoal do <a href="https://pipainn.com/" target="_blank" rel="noopener"><b>Pipa Inn</b></a>`,
     metaTitle:"PipaSurf — Previsão de Surf e Tábua de Marés da Pipa (10 dias) · Praia da Pipa, RN",
@@ -383,16 +383,16 @@ const I18N = {
   en:{
     loc:"Praia da Pipa · Rio Grande do Norte · Brazil",
     heroH1:'Pipa surf & tides, <em>always up to date</em>.',
-    heroSub:"A 10-day forecast aggregated from the world's top 6 surf sources, plus the full tide table.",
+    heroSub:"A 10-day forecast built from the consensus of 4 global wave models (NOAA, ECMWF, Météo-France and DWD), plus the full tide table.",
     pillSpot:"Praia da Pipa · RN",
     updated:"Updated at",
     live:"live data",
     demo:"demo (simulated data)",
     surfTitle:"Surf forecast — 10 days",
-    surfSub:"max wave height per day (m) · consensus of 6 sources",
+    surfSub:"max wave height per day (m) · consensus of 4 global models",
     tideTitle:"Tide table — 10 days",
     tideSub:"tide height (m) · scroll to see the next days →",
-    srcLab:(d)=>`Aggregated from 6 sources · ${d} height · click a day above and a source below`,
+    srcLab:(d)=>`Consensus of 4 global models · ${d} height · click a day above and a model below`,
     todayLower:"today",
     consensus:"Consensus",
     showing:"Showing the 10-day forecast from:",
@@ -408,7 +408,7 @@ const I18N = {
     wave:"Waves", period:"Period", wind:"Wind", swell:"Swell",
     footLeft:(t)=>`Auto-updates every hour · last: ${t}`,
     footRight:"PipaSurf.com — made for Pipa's ocean 🤙",
-    srcFootSurf:`Data sources: <a href="https://www.surfline.com/surf-report/praia-da-pipa/5842041f4e65fad6a7708fa4" target="_blank" rel="noopener">Surfline</a> · <a href="https://www.windguru.cz/209214" target="_blank" rel="noopener">Windguru</a> · <a href="https://www.surf-forecast.com/breaks/Praia-de-Pipa" target="_blank" rel="noopener">Surf-Forecast</a> · <a href="https://www.windfinder.com/forecast/pipa_praia_da_pipa" target="_blank" rel="noopener">Windfinder</a> · <a href="https://windy.app/forecast2/spot/624146/Praia+da+Pipa" target="_blank" rel="noopener">Windy.app</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (NOAA GFS-Wave and ECMWF models)`,
+    srcFootSurf:`Data: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> — NOAA GFS-Wave, ECMWF WAM, Météo-France MFWAM and DWD GWAM models · Compare: <a href="https://www.surfline.com/surf-report/praia-da-pipa/5842041f4e65fad6a7708fa4" target="_blank" rel="noopener">Surfline</a> · <a href="https://www.windguru.cz/209214" target="_blank" rel="noopener">Windguru</a> · <a href="https://www.surf-forecast.com/breaks/Praia-de-Pipa" target="_blank" rel="noopener">Surf-Forecast</a> · <a href="https://www.windfinder.com/forecast/pipa_praia_da_pipa" target="_blank" rel="noopener">Windfinder</a> · <a href="https://windy.app/forecast2/spot/624146/Praia+da+Pipa" target="_blank" rel="noopener">Windy.app</a>`,
     srcFootTide:`Data source: <a href="https://open-meteo.com/en/docs/marine-weather-api" target="_blank" rel="noopener">Open-Meteo Marine</a> (sea level) · Official reference: <a href="https://www.marinha.mil.br/chm/tabuas-de-mare" target="_blank" rel="noopener">Brazilian Navy — Tide Tables</a>`,
     banner:`Made with <span class="heart">❤️</span> from the people at the <a href="https://pipainn.com/" target="_blank" rel="noopener"><b>Pipa Inn</b></a>`,
     metaTitle:"PipaSurf — Pipa Surf Forecast & Tide Table (10 Days) · Praia da Pipa, Brazil",
@@ -420,15 +420,23 @@ const t = (k)=>I18N[lang][k];
 
 /* ================= state ================= */
 const LAT=-6.2278, LON=-35.0442, TZ="America/Fortaleza";
-const SOURCES=["Surfline","Windguru","Surf-Forecast","Windfinder","Windy.app","Open-Meteo"];
-const SRC_BIAS=[0.93,1.08,1.0,0.9,1.05,1.0];
+/* real, independently-fetched global wave models (via Open-Meteo) */
+const MODELS=[
+  {id:"ncep_gfswave025",  name:"NOAA GFS-Wave"},
+  {id:"ecmwf_wam025",     name:"ECMWF WAM"},
+  {id:"meteofrance_wave", name:"Météo-France"},
+  {id:"gwam",             name:"DWD GWAM"}
+];
 let DATA=null, isLive=false, lastUpdate=null, srcSel=null, daySel=0; /* srcSel null = consensus */
 function viewDays(){
-  if(srcSel==null||!DATA) return DATA?DATA.days:[];
-  const b=SRC_BIAS[srcSel];
-  return DATA.days.map(d=>({...d,
-    hMax:+(d.hMax*b).toFixed(1),
-    hMin:+(Math.max(0.2,d.hMin*b)).toFixed(1)}));
+  if(!DATA) return [];
+  if(srcSel==null) return DATA.days;
+  return DATA.days.map((d,i)=>{
+    const m=DATA.byModel[srcSel][i]||{};
+    const h=m.hMax??d.hCons??d.hMax;
+    return {...d, hMin:h, hMax:h, hCons:h,
+      period:m.period??d.period, swellDir:m.swellDir??d.swellDir};
+  });
 }
 
 /* seeded rng for the demo fallback */
@@ -462,37 +470,57 @@ function demoData(){
     const h=1.32+1.05*Math.cos(2*Math.PI*(hrs-2.4)/12.42)+0.22*Math.cos(2*Math.PI*hrs/12+1.1);
     tide.push({t:tt,h});
   }
-  return {days,tide};
+  days.forEach(d=>{d.hCons=+((d.hMin+d.hMax)/2).toFixed(1)});
+  const DEMO_BIAS=[1.05,1.1,0.85,1.0];
+  const byModel=DEMO_BIAS.map(b=>days.map(d=>({
+    hMax:+(d.hCons*b).toFixed(1), period:d.period, swellDir:d.swellDir})));
+  return {days,tide,byModel};
 }
 
 /* ================= live data (Open-Meteo) ================= */
 async function liveData(){
-  const marineURL=`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}`+
-    `&hourly=sea_level_height_msl&daily=wave_height_max,wave_period_max,wave_direction_dominant`+
-    `&timezone=${encodeURIComponent(TZ)}&forecast_days=10`;
-  const windURL=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}`+
-    `&daily=wind_speed_10m_max,wind_direction_10m_dominant&wind_speed_unit=kn`+
-    `&timezone=${encodeURIComponent(TZ)}&forecast_days=10`;
-  const [m,w]=await Promise.all([fetch(marineURL),fetch(windURL)]);
-  if(!m.ok||!w.ok) throw new Error("api");
-  const mj=await m.json(), wj=await w.json();
-  /* the model horizon can leave nulls on the final day(s) — carry the last valid value forward */
-  const fill=(arr)=>{let last=null;return arr.map(v=>{if(v!=null)last=v;return last;});};
-  const H=fill(mj.daily.wave_height_max), P=fill(mj.daily.wave_period_max), D=fill(mj.daily.wave_direction_dominant);
+  const base=`latitude=${LAT}&longitude=${LON}&timezone=${encodeURIComponent(TZ)}&forecast_days=10`;
+  const tideURL=`https://marine-api.open-meteo.com/v1/marine?${base}&hourly=sea_level_height_msl`;
+  const modelURL=`https://marine-api.open-meteo.com/v1/marine?${base}`+
+    `&daily=wave_height_max,wave_period_max,wave_direction_dominant&models=${MODELS.map(m=>m.id).join(",")}`;
+  const windURL=`https://api.open-meteo.com/v1/forecast?${base}`+
+    `&daily=wind_speed_10m_max,wind_direction_10m_dominant&wind_speed_unit=kn`;
+  const [tr,mr,wr]=await Promise.all([fetch(tideURL),fetch(modelURL),fetch(windURL)]);
+  if(!tr.ok||!mr.ok||!wr.ok) throw new Error("api");
+  const tj=await tr.json(), mj=await mr.json(), wj=await wr.json();
+  /* model horizons differ — carry each model's last valid value forward */
+  const fill=(arr)=>{let last=null;return (arr||[]).map(v=>{if(v!=null)last=v;return last;});};
+  const byModel=MODELS.map(m=>{
+    const H=fill(mj.daily["wave_height_max_"+m.id]);
+    const P=fill(mj.daily["wave_period_max_"+m.id]);
+    const D=fill(mj.daily["wave_direction_dominant_"+m.id]);
+    return mj.daily.time.map((_,i)=>({
+      hMax:H[i]!=null?+H[i].toFixed(1):null,
+      period:P[i]!=null?Math.round(P[i]):null,
+      swellDir:D[i]!=null?Math.round(D[i]):null,
+    }));
+  });
   const WS=fill(wj.daily.wind_speed_10m_max), WD=fill(wj.daily.wind_direction_10m_dominant);
   const days=mj.daily.time.map((iso,i)=>{
-    const hMax=H[i]??1.0;
+    const vals=byModel.map(mm=>mm[i]).filter(v=>v&&v.hMax!=null);
+    const hs=vals.map(v=>v.hMax);
+    const mean=hs.length?hs.reduce((a,b)=>a+b,0)/hs.length:0.8;
+    const ps=vals.map(v=>v.period).filter(v=>v!=null);
+    let sx=0,sy=0;
+    vals.forEach(v=>{if(v.swellDir!=null){sx+=Math.cos(v.swellDir*Math.PI/180);sy+=Math.sin(v.swellDir*Math.PI/180);}});
+    const dir=(Math.atan2(sy,sx)*180/Math.PI+360)%360;
     return{
       date:new Date(iso+"T12:00:00"),
-      hMin:+(Math.max(0.2,hMax*0.72)).toFixed(1),
-      hMax:+hMax.toFixed(1),
-      period:Math.round(P[i]??8),
-      swellDir:Math.round(D[i]??120),
+      hMin:hs.length?+Math.min(...hs).toFixed(1):0.6,   /* lowest model */
+      hMax:hs.length?+Math.max(...hs).toFixed(1):1.0,   /* highest model */
+      hCons:+mean.toFixed(1),                            /* consensus = model mean */
+      period:ps.length?Math.round(ps.reduce((a,b)=>a+b,0)/ps.length):8,
+      swellDir:Math.round(dir),
       windKts:Math.round(WS[i]??12),
       windDir:Math.round(WD[i]??130),
     };
   });
-  const sea=mj.hourly.time.map((iso,i)=>({t:new Date(iso), h:mj.hourly.sea_level_height_msl[i]}))
+  const sea=tj.hourly.time.map((iso,i)=>({t:new Date(iso), h:tj.hourly.sea_level_height_msl[i]}))
     .filter(p=>p.h!=null);
   if(sea.length<48) throw new Error("tide");
   /* station calibration for Pipa (vs Abacateiro tide station / Surfline):
@@ -500,7 +528,7 @@ async function liveData(){
      rather than the local chart datum (+1.21 m). */
   const TIDE_DT=26*60000, TIDE_DATUM=1.21;
   const tide=sea.map(p=>({t:new Date(p.t.getTime()+TIDE_DT), h:p.h+TIDE_DATUM}));
-  return {days,tide};
+  return {days,tide,byModel};
 }
 
 /* ================= helpers ================= */
@@ -527,7 +555,8 @@ const dirArrow=(deg)=>`<span class="arrow" style="transform:rotate(${deg+180}deg
 const compass=(deg)=>{const c=lang==="pt"?["N","NE","L","SE","S","SO","O","NO"]:["N","NE","E","SE","S","SW","W","NW"];return c[Math.round(deg/45)%8]};
 function rating(d){
   let s=0;
-  if(d.hMax>=0.8)s++; if(d.hMax>=1.3)s++;
+  const h=d.hCons??d.hMax;
+  if(h>=0.8)s++; if(h>=1.3)s++;
   if(d.period>=10)s++; if(d.period>=13)s++;
   if(d.windKts>14)s=Math.max(0,s-1);
   return Math.min(4,s);
@@ -557,7 +586,8 @@ function renderWave(){
   const days=viewDays();
   const W=1040,H=230,padL=44,padR=10,padT=26,padB=34;
   const iw=W-padL-padR, ih=H-padT-padB;
-  const maxH=Math.max(2,Math.ceil(Math.max(...days.map(d=>d.hMax))*2)/2+0.5);
+  const val=(d)=>d.hCons??d.hMax;
+  const maxH=Math.max(2,Math.ceil(Math.max(...days.map(val))*2)/2+0.5);
   const y=(v)=>padT+ih*(1-v/maxH);
   const band=iw/10;
   const bw=Math.min(24,band*0.42);
@@ -569,14 +599,14 @@ function renderWave(){
     g+=`<text x="${padL-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--muted)" style="font-variant-numeric:tabular-nums">${v.toFixed(1)}</text>`;
   }
   /* bars */
-  const maxDay=days.reduce((a,d,i)=>d.hMax>days[a].hMax?i:a,0);
+  const maxDay=days.reduce((a,d,i)=>val(d)>val(days[a])?i:a,0);
   days.forEach((d,i)=>{
     const cx=padL+band*i+band/2;
-    const bx=cx-bw/2, by=y(d.hMax), bh=y(0)-by;
+    const bx=cx-bw/2, by=y(val(d)), bh=y(0)-by;
     g+=`<path class="wbar" data-i="${i}" d="M${bx},${y(0)} L${bx},${by+4} Q${bx},${by} ${bx+4},${by} L${bx+bw-4},${by} Q${bx+bw},${by} ${bx+bw},${by+4} L${bx+bw},${y(0)} Z" fill="var(--wave)" opacity="${i===daySel?1:.75}"/>`;
     /* selective label: biggest day only */
     if(i===maxDay){
-      g+=`<text x="${cx}" y="${by-8}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">${d.hMax.toFixed(1)} m</text>`;
+      g+=`<text x="${cx}" y="${by-8}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">${val(d).toFixed(1)} m</text>`;
     }
     const lab=t("days")[d.date.getDay()];
     g+=`<text x="${cx}" y="${H-12}" text-anchor="middle" font-size="11.5" fill="${i===daySel?(i===0?'var(--tide)':'var(--wave)'):'var(--muted)'}" font-weight="${i===daySel?'700':'400'}">${lab} ${d.date.getDate()}</text>`;
@@ -633,7 +663,7 @@ function renderDays(){
     card.innerHTML=
       `<div class="dw">${i===0?t("today"):t("days")[d.date.getDay()]}</div>`+
       `<div class="dt">${d.date.getDate()} ${t("months")[d.date.getMonth()]}</div>`+
-      `<div class="hh">${d.hMin.toFixed(1)}–${d.hMax.toFixed(1)}<small> m</small></div>`+
+      `<div class="hh">${d.hMin===d.hMax?d.hMax.toFixed(1):d.hMin.toFixed(1)+"–"+d.hMax.toFixed(1)}<small> m</small></div>`+
       `<span class="rate r${r}">${t("ratings")[r]}</span>`+
       `<div class="meta"><b>${d.period}s</b> ${dirArrow(d.swellDir)}<br>${d.windKts}kt ${dirArrow(d.windDir)} ${compass(d.windDir)}</div>`;
     card.addEventListener("click",()=>{daySel=i;renderWave();renderDays();renderSources();});
@@ -646,8 +676,8 @@ function renderSources(){
   const el=document.getElementById("src-chips");
   el.innerHTML="";
   const selDay=DATA.days[daySel]||DATA.days[0];
-  const today=selDay.hMax;
-  const vals=SRC_BIAS.map(b=>+(today*b).toFixed(1));
+  const today=selDay.hCons??selDay.hMax;
+  const vals=MODELS.map((m,mi)=>DATA.byModel[mi]&&DATA.byModel[mi][daySel]?DATA.byModel[mi][daySel].hMax:null);
   const dayLabel=daySel===0?t("todayLower"):`${t("days")[selDay.date.getDay()]} ${selDay.date.getDate()} ${t("months")[selDay.date.getMonth()]}`;
   document.getElementById("src-lab").textContent=t("srcLab")(dayLabel);
   const mk=(label,val,idx,cls)=>{
@@ -663,15 +693,16 @@ function renderSources(){
     el.appendChild(chip);
   };
   mk(t("consensus"),today,null," consensus");
-  SOURCES.forEach((s,i)=>mk(s,vals[i],i,""));
-  const spread=(Math.max(...vals)-Math.min(...vals))/today;
+  MODELS.forEach((m,i)=>{if(vals[i]!=null)mk(m.name,vals[i],i,"")});
+  const good=vals.filter(v=>v!=null);
+  const spread=good.length>1?(Math.max(...good)-Math.min(...good))/Math.max(0.1,today):0;
   const agree=Math.max(50,Math.round(100-spread*100));
   document.getElementById("agree-line").innerHTML=t("agree")(agree,dayLabel);
   const note=document.getElementById("src-note");
   note.innerHTML="";
   const lead=document.createTextNode(t("showing")+" ");
   const bb=document.createElement("b");
-  bb.textContent=srcSel==null?t("consensus"):SOURCES[srcSel];
+  bb.textContent=srcSel==null?t("consensus"):MODELS[srcSel].name;
   note.append(lead,bb);
 }
 

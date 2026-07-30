@@ -79,6 +79,9 @@
     font-size:13px;color:var(--ink-2);text-align:center;
   }
   .adbanner b{color:var(--ink);font-weight:750}
+  .adbanner a{color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+  .adbanner a:hover{color:var(--tide);border-bottom-color:var(--tide)}
+  .adbanner a:hover b{color:var(--tide)}
   .adbanner .heart{color:#e66767}
 
   /* ---------- layout ---------- */
@@ -265,7 +268,6 @@
     <div class="statusline">
       <span class="pill"><span class="dot live" id="live-dot"></span><span id="pill-updated"></span></span>
       <span class="pill">🌊 <span data-i18n="pillSpot"></span></span>
-      <span class="pill" id="pill-mode"></span>
     </div>
   </div>
 
@@ -350,7 +352,7 @@ const I18N = {
     footRight:"PipaSurf.com — feito para o mar da Pipa 🤙",
     srcFootSurf:`Fontes de dados: <a href="https://www.surfline.com/surf-report/praia-da-pipa/5842041f4e65fad6a7708fa4" target="_blank" rel="noopener">Surfline</a> · <a href="https://www.windguru.cz/209214" target="_blank" rel="noopener">Windguru</a> · <a href="https://www.surf-forecast.com/breaks/Praia-de-Pipa" target="_blank" rel="noopener">Surf-Forecast</a> · <a href="https://www.windfinder.com/forecast/praia_de_pipa" target="_blank" rel="noopener">Windfinder</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (modelos NOAA GFS-Wave e ECMWF)`,
     srcFootTide:`Fonte de dados: <a href="https://open-meteo.com/en/docs/marine-weather-api" target="_blank" rel="noopener">Open-Meteo Marine</a> (nível do mar) · Referência oficial: <a href="https://www.marinha.mil.br/chm/tabuas-de-mare" target="_blank" rel="noopener">Marinha do Brasil — Tábuas de Maré</a>`,
-    banner:`Feito com <span class="heart">❤️</span> pelo pessoal do <b>Surfcamp Arara</b>`,
+    banner:`Feito com <span class="heart">❤️</span> pelo pessoal do <a href="https://surfcamparara.com/" target="_blank" rel="noopener"><b>Surfcamp Arara</b></a>`,
   },
   en:{
     loc:"Praia da Pipa · Rio Grande do Norte · Brazil",
@@ -380,7 +382,7 @@ const I18N = {
     footRight:"PipaSurf.com — made for Pipa's ocean 🤙",
     srcFootSurf:`Data sources: <a href="https://www.surfline.com/surf-report/praia-da-pipa/5842041f4e65fad6a7708fa4" target="_blank" rel="noopener">Surfline</a> · <a href="https://www.windguru.cz/209214" target="_blank" rel="noopener">Windguru</a> · <a href="https://www.surf-forecast.com/breaks/Praia-de-Pipa" target="_blank" rel="noopener">Surf-Forecast</a> · <a href="https://www.windfinder.com/forecast/praia_de_pipa" target="_blank" rel="noopener">Windfinder</a> · <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (NOAA GFS-Wave and ECMWF models)`,
     srcFootTide:`Data source: <a href="https://open-meteo.com/en/docs/marine-weather-api" target="_blank" rel="noopener">Open-Meteo Marine</a> (sea level) · Official reference: <a href="https://www.marinha.mil.br/chm/tabuas-de-mare" target="_blank" rel="noopener">Brazilian Navy — Tide Tables</a>`,
-    banner:`Made with <span class="heart">❤️</span> from the people at <b>Surfcamp Arara</b>`,
+    banner:`Made with <span class="heart">❤️</span> from the people at <a href="https://surfcamparara.com/" target="_blank" rel="noopener"><b>Surfcamp Arara</b></a>`,
   }
 };
 let lang = "en";
@@ -437,20 +439,27 @@ async function liveData(){
   const [m,w]=await Promise.all([fetch(marineURL),fetch(windURL)]);
   if(!m.ok||!w.ok) throw new Error("api");
   const mj=await m.json(), wj=await w.json();
+  /* the model horizon can leave nulls on the final day(s) — carry the last valid value forward */
+  const fill=(arr)=>{let last=null;return arr.map(v=>{if(v!=null)last=v;return last;});};
+  const H=fill(mj.daily.wave_height_max), P=fill(mj.daily.wave_period_max), D=fill(mj.daily.wave_direction_dominant);
+  const WS=fill(wj.daily.wind_speed_10m_max), WD=fill(wj.daily.wind_direction_10m_dominant);
   const days=mj.daily.time.map((iso,i)=>{
-    const hMax=mj.daily.wave_height_max[i];
+    const hMax=H[i]??1.0;
     return{
       date:new Date(iso+"T12:00:00"),
       hMin:+(Math.max(0.2,hMax*0.72)).toFixed(1),
       hMax:+hMax.toFixed(1),
-      period:Math.round(mj.daily.wave_period_max[i]),
-      swellDir:Math.round(mj.daily.wave_direction_dominant[i]),
-      windKts:Math.round(wj.daily.wind_speed_10m_max[i]),
-      windDir:Math.round(wj.daily.wind_direction_10m_dominant[i]),
+      period:Math.round(P[i]??8),
+      swellDir:Math.round(D[i]??120),
+      windKts:Math.round(WS[i]??12),
+      windDir:Math.round(WD[i]??130),
     };
   });
-  const base=Math.min(...mj.hourly.sea_level_height_msl);
-  const tide=mj.hourly.time.map((iso,i)=>({t:new Date(iso), h:mj.hourly.sea_level_height_msl[i]-base+0.15}));
+  const sea=mj.hourly.time.map((iso,i)=>({t:new Date(iso), h:mj.hourly.sea_level_height_msl[i]}))
+    .filter(p=>p.h!=null);
+  if(sea.length<48) throw new Error("tide");
+  const base=Math.min(...sea.map(p=>p.h));
+  const tide=sea.map(p=>({t:p.t, h:p.h-base+0.15}));
   return {days,tide};
 }
 
@@ -493,7 +502,6 @@ function renderChrome(){
   document.getElementById("btn-en").classList.toggle("on",lang==="en");
   const time=lastUpdate?fmtTime(lastUpdate):"—";
   document.getElementById("pill-updated").textContent=`${t("updated")} ${time}`;
-  document.getElementById("pill-mode").textContent=isLive?`⚡ ${t("live")}`:`🧪 ${t("demo")}`;
   document.getElementById("foot-left").textContent=t("footLeft")(time);
   document.getElementById("src-foot-surf").innerHTML=t("srcFootSurf");
   document.getElementById("src-foot-tide").innerHTML=t("srcFootTide");

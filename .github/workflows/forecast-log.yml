@@ -1,0 +1,27 @@
+name: Log daily forecast
+
+# Logs PipaSurf's own daily forecast to forecast-log.csv every morning
+# so predicted-vs-observed can be tracked over time (see HANDOVER.md).
+
+on:
+  schedule:
+    - cron: "0 9 * * *"   # 09:00 UTC = 06:00 in Pipa (UTC-3)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  log:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compute and append today's forecast
+        run: node .github/scripts/log-forecast.js
+      - name: Commit the log
+        run: |
+          git config user.name "pipasurf-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add forecast-log.csv
+          git diff --cached --quiet || git commit -m "Log forecast $(date -u +%F)"
+          git push

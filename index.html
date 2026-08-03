@@ -203,8 +203,8 @@
     border-radius:999px;padding:3px 8px;margin:0 auto;
   }
   .r0{background:rgba(230,103,103,.16);color:#ee8484}   /* Poor  — red    (< 0.5 m)   */
-  .r1{background:rgba(230,180,90,.16);color:#e6c076}    /* Fair  — amber  (0.5–0.9 m) */
-  .r2{background:rgba(57,135,229,.18);color:#6da7ec}    /* Good  — blue   (1.0–1.4 m) */
+  .r1{background:rgba(230,180,90,.16);color:#e6c076}    /* Fair  — amber  (0.5–1.0 m) */
+  .r2{background:rgba(57,135,229,.18);color:#6da7ec}    /* Good  — blue   (>1.0–1.4 m) */
   .r3{background:rgba(25,192,138,.18);color:#3fd6a4}    /* Great — green  (1.5–2.0 m) */
   .r4{background:rgba(167,111,235,.2);color:#c39bf2}    /* Epic  — purple (> 2.0 m)   */
 
@@ -645,10 +645,10 @@ const compass=(deg)=>{const c=lang==="pt"?["N","NE","L","SE","S","SO","O","NO"]:
 function rating(d){
   /* rated on the day's max BEACH surf height — fixed, does NOT change with the
      Beach/Offshore display toggle:
-     < 0.5 m Poor · 0.5–0.9 Fair · 1.0–1.4 Good · 1.5–2.0 Great · > 2.0 Epic */
+     < 0.5 m Poor · 0.5–1.0 Fair · > 1.0–1.4 Good · 1.5–2.0 Great · > 2.0 Epic */
   const h=beachH(d.hMax,d.period,d);
   if(h<0.5) return 0;
-  if(h<1.0) return 1;
+  if(h<=1.0) return 1;
   if(h<1.5) return 2;
   if(h<=2.0) return 3;
   return 4;

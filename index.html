@@ -206,8 +206,8 @@
   .r1{background:rgba(230,180,90,.16);color:#e6c076}    /* Fair  — amber  (>0.8–1.0 m)   */
   .r2{background:rgba(57,135,229,.18);color:#6da7ec}    /* Good  — blue   (>1.0–1.4 m)   */
   .r3{background:rgba(25,192,138,.18);color:#3fd6a4}    /* Great — green  (1.5–1.9 m)    */
-  .r4{background:rgba(167,111,235,.2);color:#c39bf2}    /* Epic  — purple (2.0–2.4 m)    */
-  .r5{background:rgba(242,208,107,.2);color:#f2d06b}    /* Slater — gold (>= 2.5 m)     */
+  .r4{background:rgba(167,111,235,.2);color:#c39bf2}    /* Epic  — purple (2.0–2.1 m)    */
+  .r5{background:rgba(242,208,107,.2);color:#f2d06b}    /* Slater — gold (>= 2.2 m)     */
   .goat{margin:5px auto 0;line-height:0}
   .goat img{display:block;margin:0 auto}
 
@@ -649,8 +649,11 @@ const compass=(deg)=>{const c=lang==="pt"?["N","NE","L","SE","S","SO","O","NO"]:
 function rating(d){
   /* rated on the day's max BEACH surf height — fixed, does NOT change with the
      Beach/Offshore display toggle:
-     <= 0.8 m Poor · >0.8–1.0 Fair · >1.0–<1.5 Good · 1.5–<2.0 Great ·
-     2.0–<2.5 Epic · >= 2.5 Slater (shows the Kelly icon on the day card).
+     <= 0.8 m Poor · >0.8–1.0 Fair · >1.0–<1.5 Good · 1.5+ Great ·
+     2.0+ Epic · 2.2+ Slater (shows the Kelly icon on the day card).
+     Upper tiers scale UP off the highest single reading (h = top of the
+     day's range): if even one model reading hits the bar, the day gets
+     the higher tier — e.g. readings of 2.1 with one 2.2 = Slater.
      Special condition: if ANY reading that day (the low end of the range)
      drops below 0.8 m, the whole day is Poor. */
   const h=beachH(d.hMax,d.period,d);
@@ -659,7 +662,7 @@ function rating(d){
   if(h<=1.0) return 1;
   if(h<1.5) return 2;
   if(h<2.0) return 3;
-  if(h<2.5) return 4;
+  if(h<2.2) return 4;
   return 5;
 }
 

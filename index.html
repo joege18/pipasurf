@@ -207,9 +207,9 @@
   .r2{background:rgba(57,135,229,.18);color:#6da7ec}    /* Good  — blue   (>1.0–1.4 m)   */
   .r3{background:rgba(25,192,138,.18);color:#3fd6a4}    /* Great — green  (1.5–1.9 m)    */
   .r4{background:rgba(167,111,235,.2);color:#c39bf2}    /* Epic  — purple (2.0–2.4 m)    */
-  .r5{background:rgba(242,208,107,.2);color:#f2d06b}    /* Slater-esque — gold (>= 2.5 m) */
+  .r5{background:rgba(242,208,107,.2);color:#f2d06b}    /* Slater — gold (>= 2.5 m)     */
   .goat{margin:5px auto 0;line-height:0}
-  .goat svg{display:block;margin:0 auto}
+  .goat img{display:block;margin:0 auto}
 
   /* ---------- sources ---------- */
   .sources{margin-top:18px;border-top:1px solid var(--grid);padding-top:14px}
@@ -430,7 +430,7 @@ const I18N = {
     daysFull:["domingo","segunda","terça","quarta","quinta","sexta","sábado"],
     months:["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"],
     today:"hoje",
-    ratings:["Fraco","Razoável","Bom","Ótimo","Épico","Slateresco"],
+    ratings:["Fraco","Razoável","Bom","Ótimo","Épico","Slater"],
     wave:"Ondas", period:"Período", wind:"Vento", swell:"Ondulação",
     footLeft:(t)=>`Atualização automática a cada hora · última: ${t}`,
     footRight:"PipaSurf.com — feito para o mar da Pipa 🤙",
@@ -468,7 +468,7 @@ const I18N = {
     daysFull:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
     months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     today:"today",
-    ratings:["Poor","Fair","Good","Great","Epic","Slater-esque"],
+    ratings:["Poor","Fair","Good","Great","Epic","Slater"],
     wave:"Waves", period:"Period", wind:"Wind", swell:"Swell",
     footLeft:(t)=>`Auto-updates every hour · last: ${t}`,
     footRight:"PipaSurf.com — made for Pipa's ocean 🤙",
@@ -650,7 +650,7 @@ function rating(d){
   /* rated on the day's max BEACH surf height — fixed, does NOT change with the
      Beach/Offshore display toggle:
      <= 0.8 m Poor · >0.8–1.0 Fair · >1.0–<1.5 Good · 1.5–<2.0 Great ·
-     2.0–<2.5 Epic · >= 2.5 Slater-esque (shows the GOAT icon on the day card).
+     2.0–<2.5 Epic · >= 2.5 Slater (shows the Kelly icon on the day card).
      Special condition: if ANY reading that day (the low end of the range)
      drops below 0.8 m, the whole day is Poor. */
   const h=beachH(d.hMax,d.period,d);
@@ -770,7 +770,7 @@ function renderDays(){
       `<div class="dt">${d.date.getDate()} ${t("months")[d.date.getMonth()]}</div>`+
       `<div class="hh">${(()=>{const lo=dispH(d.hMin,d.period,d),hi=dispH(d.hMax,d.period,d);return lo===hi?hi.toFixed(1):lo.toFixed(1)+"–"+hi.toFixed(1)})()}<small> m</small></div>`+
       `<span class="rate r${r}">${t("ratings")[r]}</span>`+
-      (r===5?`<div class="goat" title="${t("ratings")[5]}" aria-label="${t("ratings")[5]}"><svg viewBox="0 0 24 24" width="22" height="22" role="img"><g fill="#f2d06b"><circle cx="13.2" cy="3.6" r="2.1"/><path d="M10.2 6.9l4.6-.6 2.2 3.6-2.5 1 1.1 3.9-3.4 1-1.5-3.8-2.1 1.2-1.6-2.2 3.2-2.3z"/><path d="M2.5 19.6c6.2-2.9 12.8-2.9 19 0l-.4 1.9c-6-2.6-12.2-2.6-18.2 0z"/></g></svg></div>`:"")+
+      (r===5?`<div class="goat"><img src="/slater.png" width="28" height="28" alt="${t("ratings")[5]}" title="${t("ratings")[5]}" loading="lazy"></div>`:"")+
       `<div class="meta"><b>${d.period}s</b> ${dirArrow(d.swellDir)}<br>${d.windKts}kt ${dirArrow(d.windDir)} ${compass(d.windDir)}</div>`;
     card.addEventListener("click",()=>{daySel=i;renderWave();renderDays();renderSources();});
     el.appendChild(card);

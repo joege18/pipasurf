@@ -62,7 +62,7 @@ const block = `<!-- FORECAST_LOG_START -->
 ${body}
         </tbody>
       </table>
-      <p style="margin-top:10px;font-size:11.5px;color:var(--muted)">${avgLine}observed_m = the wave model's final analyzed mean offshore height for that day (Open-Meteo, after data assimilation); accuracy scores offshore_mean_m against it. — = not yet analyzed.</p>
+      <p style="margin-top:10px;font-size:11.5px;color:var(--muted)">${avgLine}observed_m = the wave model's final analyzed mean offshore height for that day (Open-Meteo, after real measurements are assimilated). accuracy compares the offshore_mean_m we forecast that morning against observed_m: 100% minus the error as a share of observed — e.g. forecast 1.9 m vs observed 1.8 m is 0.1 m off, so 94%. 100% = match to within 0.1 m rounding. Only the offshore mean is scored, not the min–max range or beach estimate. — = not yet analyzed.</p>
     </details>
   </div>
 </section>

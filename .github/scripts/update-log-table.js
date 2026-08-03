@@ -9,7 +9,8 @@
 // Accuracy = how close offshore_mean_m came to the model's final analyzed
 // mean for that day (100% = exact): max(0, 100 - |fc-obs|/obs*100).
 const fs = require("fs");
-const COLS = ["date", "beach_lo_m", "beach_hi_m", "offshore_min_m", "offshore_mean_m", "offshore_max_m"];
+// left block of columns; the forecast/observed/accuracy trio is appended after these
+const COLS = ["date", "beach_lo_m", "beach_hi_m", "offshore_min_m", "offshore_max_m"];
 const r1 = (x) => Math.round(x * 10) / 10;
 
 const lines = fs.readFileSync("forecast-log.csv", "utf8").trim().split(/\r?\n/);
@@ -43,7 +44,8 @@ const tr = (r) => {
     accCell = acc + "%";
   }
   const cells = idx.map((i) => "<td>" + (f[i] ?? "") + "</td>").join("");
-  return "          <tr>" + cells + "<td>" + obsCell + "</td><td>" + accCell + "</td></tr>";
+  const fcCell = f[fcMeanIdx] ?? "";
+  return "          <tr>" + cells + "<td>" + fcCell + "</td><td>" + obsCell + "</td><td>" + accCell + "</td></tr>";
 };
 const body = rows.map(tr).join("\n");
 const avg = accs.length ? Math.round(accs.reduce((a, b) => a + b, 0) / accs.length) : null;
@@ -57,12 +59,12 @@ const block = `<!-- FORECAST_LOG_START -->
     <details class="tbl">
       <summary>Forecast log — last 14 days · Histórico de previsões</summary>
       <table class="tide-table">
-        <thead><tr>${COLS.map((c) => "<th>" + c + "</th>").join("")}<th>observed_m</th><th>accuracy</th></tr></thead>
+        <thead><tr>${COLS.map((c) => "<th>" + c + "</th>").join("")}<th>forecast_m</th><th>observed_m</th><th>accuracy</th></tr></thead>
         <tbody>
 ${body}
         </tbody>
       </table>
-      <p style="margin-top:10px;font-size:11.5px;color:var(--muted)">${avgLine}observed_m = the wave model's final analyzed mean offshore height for that day (Open-Meteo, after real measurements are assimilated). accuracy compares the offshore_mean_m we forecast that morning against observed_m: 100% minus the error as a share of observed — e.g. forecast 1.9 m vs observed 1.8 m is 0.1 m off, so 94%. 100% = match to within 0.1 m rounding. Only the offshore mean is scored, not the min–max range or beach estimate. — = not yet analyzed.</p>
+      <p style="margin-top:10px;font-size:11.5px;color:var(--muted)">${avgLine}forecast_m = the mean offshore height we forecast that morning (consensus of 3 wave models). observed_m = the model's final analyzed value for the same day (Open-Meteo, after real measurements are assimilated). accuracy compares the two: 100% minus the error as a share of observed — e.g. forecast 1.9 m vs observed 1.8 m is 0.1 m off, so 94%. 100% = match to within 0.1 m rounding. Only forecast_m is scored, not the min–max range or beach estimate. — = not yet analyzed.</p>
     </details>
   </div>
 </section>

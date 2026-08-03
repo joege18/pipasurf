@@ -18,12 +18,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Compute and append today's forecast
         run: node .github/scripts/log-forecast.js
+      - name: Log observed conditions for past days
+        run: node .github/scripts/log-observed.js
       - name: Refresh homepage log table
         run: node .github/scripts/update-log-table.js
       - name: Commit the log
         run: |
           git config user.name "pipasurf-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add forecast-log.csv index.html
+          git add forecast-log.csv observed-log.csv index.html
           git diff --cached --quiet || git commit -m "Log forecast $(date -u +%F)"
           git push

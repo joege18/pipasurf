@@ -6,6 +6,7 @@
 // forecast against. Never fetches today (the day isn't complete yet).
 // forecast-log.csv (predictions) is never touched.
 const fs = require("fs");
+const { fetchJSON } = require("./fetch-json.js"); // retries + sane connect timeout
 const LAT = -6.2278, LON = -35.0442, TZ = "America/Fortaleza";
 const MODELS = ["ncep_gfswave025", "ecmwf_wam025", "gwam"];
 const r1 = (x) => Math.round(x * 10) / 10;
@@ -13,7 +14,7 @@ const r1 = (x) => Math.round(x * 10) / 10;
   const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}` +
     `&timezone=${encodeURIComponent(TZ)}&past_days=5&forecast_days=1` +
     `&daily=wave_height_max&models=${MODELS.join(",")}`;
-  const j = await (await fetch(url)).json();
+  const j = await fetchJSON(url, "observed waves");
   const today = j.daily.time[j.daily.time.length - 1];
   const f = "observed-log.csv";
   let txt = fs.existsSync(f) ? fs.readFileSync(f, "utf8")

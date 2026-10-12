@@ -2,6 +2,7 @@
 // Appends today's own forecast to forecast-log.csv so it can be verified
 // against observed conditions later. Run by .github/workflows/forecast-log.yml.
 const fs = require("fs");
+const { fetchJSON } = require("./fetch-json.js"); // retries + sane connect timeout
 const LAT = -6.2278, LON = -35.0442, TZ = "America/Fortaleza";
 const MODELS = ["ncep_gfswave025", "ecmwf_wam025", "gwam"];
 const KG = (H, T) => 0.39 * Math.pow(9.81, 0.2) * Math.pow((T || 8) * H * H, 0.4);
@@ -10,7 +11,7 @@ const r1 = (x) => Math.round(x * 10) / 10;
   const base = `latitude=${LAT}&longitude=${LON}&timezone=${encodeURIComponent(TZ)}&forecast_days=1`;
   const mURL = `https://marine-api.open-meteo.com/v1/marine?${base}&daily=wave_height_max&models=${MODELS.join(",")}`;
   const sURL = `https://marine-api.open-meteo.com/v1/marine?${base}&daily=swell_wave_height_max,swell_wave_period_max`;
-  const [mj, sj] = await Promise.all([fetch(mURL).then(r => r.json()), fetch(sURL).then(r => r.json())]);
+  const [mj, sj] = await Promise.all([fetchJSON(mURL, "wave models"), fetchJSON(sURL, "swell")]);
   const date = mj.daily.time[0];
   const hs = MODELS.map(m => mj.daily["wave_height_max_" + m][0]).filter(v => v != null);
   if (!hs.length) { console.log("no model data — skipping"); return; }
